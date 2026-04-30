@@ -55,9 +55,15 @@ Veja [PATTERNS.md](PATTERNS.md) para documentação detalhada com exemplos:
 - **index.html** - Interface em HTML/CSS (estático)
 - **script.js** - Consumo da API via `fetch` sem dependências
 
+## 🚀 Produção
+
+**Aplicação ao vivo:**
+- Frontend: [https://pedidosweb1.netlify.app/](https://pedidosweb1.netlify.app/)
+- API: [https://pedidos-rg35.onrender.com/pedidos](https://pedidos-rg35.onrender.com/pedidos)
+
 ## Como executar
 
-### Backend
+### Backend (desenvolvimento)
 
 ```bash
 php -S localhost:8000 -t backend backend/router.php
@@ -65,7 +71,7 @@ php -S localhost:8000 -t backend backend/router.php
 
 A API estará disponível em `http://localhost:8000/pedidos`
 
-### Frontend
+### Frontend (desenvolvimento)
 
 Abra `frontend/index.html` no navegador. 
 
