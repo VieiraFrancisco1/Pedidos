@@ -1,0 +1,9 @@
+services:
+  app:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app/project
+    working_dir: /app/project
+    command: php -S 0.0.0.0:8000 -t backend backend/router.php

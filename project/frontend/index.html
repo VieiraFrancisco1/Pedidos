@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sistema de Pedidos</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f4efe7;
+      --bg-2: #e8dccb;
+      --surface: rgba(255, 255, 255, 0.84);
+      --surface-strong: #ffffff;
+      --text: #1d1b18;
+      --muted: #6a625a;
+      --primary: #0f766e;
+      --primary-dark: #115e59;
+      --accent: #b45309;
+      --border: rgba(29, 27, 24, 0.12);
+      --shadow: 0 24px 60px rgba(45, 35, 25, 0.14);
+      font-family: Inter, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(15, 118, 110, 0.18), transparent 34%),
+        radial-gradient(circle at top right, rgba(180, 83, 9, 0.16), transparent 30%),
+        linear-gradient(180deg, var(--bg), var(--bg-2));
+    }
+
+    .page {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 32px 0 56px;
+    }
+
+    .hero {
+      display: grid;
+      gap: 14px;
+      grid-template-columns: 1.4fr 0.6fr;
+      align-items: end;
+      margin-bottom: 24px;
+    }
+
+    .hero__title {
+      margin: 0;
+      font-size: clamp(2rem, 4vw, 4rem);
+      line-height: 0.95;
+      letter-spacing: -0.05em;
+    }
+
+    .hero__subtitle {
+      margin: 0;
+      max-width: 60ch;
+      color: var(--muted);
+      font-size: 1rem;
+      line-height: 1.6;
+    }
+
+    .hero__badge {
+      justify-self: end;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 16px;
+      border-radius: 999px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      color: var(--primary-dark);
+      font-weight: 700;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+      gap: 24px;
+    }
+
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(16px);
+    }
+
+    .panel__header {
+      padding: 22px 24px 0;
+    }
+
+    .panel__title {
+      margin: 0 0 6px;
+      font-size: 1.2rem;
+    }
+
+    .panel__desc {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .form {
+      padding: 20px 24px 24px;
+      display: grid;
+      gap: 18px;
+    }
+
+    .field-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .field {
+      display: grid;
+      gap: 8px;
+    }
+
+    .field label {
+      font-size: 0.92rem;
+      font-weight: 700;
+    }
+
+    .field input,
+    .field select,
+    .item-row input {
+      width: 100%;
+      border: 1px solid var(--border);
+      background: var(--surface-strong);
+      border-radius: 14px;
+      padding: 12px 14px;
+      font: inherit;
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .field input:focus,
+    .field select:focus,
+    .item-row input:focus {
+      border-color: rgba(15, 118, 110, 0.5);
+      box-shadow: 0 0 0 4px rgba(15, 118, 110, 0.12);
+    }
+
+    .items {
+      display: grid;
+      gap: 14px;
+    }
+
+    .items__header,
+    .orders__header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .items__header h3,
+    .orders__header h3 {
+      margin: 0;
+      font-size: 1rem;
+    }
+
+    .items__header p,
+    .orders__header p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .item-row {
+      display: grid;
+      grid-template-columns: 0.7fr 1.2fr 0.8fr 0.6fr auto;
+      gap: 10px;
+      align-items: end;
+      padding: 14px;
+      background: rgba(255, 255, 255, 0.68);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+    }
+
+    .mini-label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .button {
+      border: 0;
+      border-radius: 14px;
+      padding: 12px 16px;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    }
+
+    .button:hover {
+      transform: translateY(-1px);
+    }
+
+    .button--primary {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: white;
+      box-shadow: 0 14px 30px rgba(15, 118, 110, 0.28);
+    }
+
+    .button--ghost {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+
+    .button--danger {
+      background: rgba(180, 83, 9, 0.12);
+      color: var(--accent);
+      border: 1px solid rgba(180, 83, 9, 0.18);
+    }
+
+    .button--small {
+      padding: 10px 12px;
+      font-size: 0.9rem;
+    }
+
+    .actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .hint {
+      color: var(--muted);
+      font-size: 0.92rem;
+      line-height: 1.5;
+    }
+
+    .orders {
+      padding: 20px 24px 24px;
+      display: grid;
+      gap: 16px;
+    }
+
+    .order-card {
+      padding: 18px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.78);
+      border: 1px solid var(--border);
+      display: grid;
+      gap: 14px;
+    }
+
+    .order-card__top {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 12px;
+      border-radius: 999px;
+      background: rgba(15, 118, 110, 0.12);
+      color: var(--primary-dark);
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+
+    .order-card__meta {
+      color: var(--muted);
+      font-size: 0.92rem;
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .items-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .item-line {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      background: rgba(244, 239, 231, 0.72);
+    }
+
+    .item-line strong {
+      display: block;
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    .footer-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .empty-state {
+      padding: 18px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.6);
+      color: var(--muted);
+      border: 1px dashed rgba(29, 27, 24, 0.18);
+    }
+
+    @media (max-width: 980px) {
+      .hero,
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero__badge {
+        justify-self: start;
+      }
+
+      .item-row {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .item-row .remove-item {
+        grid-column: 1 / -1;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .page {
+        width: min(100% - 18px, 1180px);
+        padding-top: 18px;
+      }
+
+      .field-grid,
+      .item-row {
+        grid-template-columns: 1fr;
+      }
+
+      .items__header,
+      .orders__header,
+      .footer-actions,
+      .order-card__top {
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="hero">
+      <div>
+        <h1 class="hero__title">Sistema de pedidos em PHP puro</h1>
+        <p class="hero__subtitle">
+          API simples em camadas, persistência em JSON e frontend leve para criar, listar e compartilhar pedidos pelo WhatsApp.
+        </p>
+      </div>
+      <div class="hero__badge">API REST + JSON + WhatsApp</div>
+    </section>
+
+    <section class="grid">
+      <article class="panel">
+        <div class="panel__header">
+          <h2 class="panel__title">Criar pedido</h2>
+          <p class="panel__desc">Preencha os itens do pedido e envie para a API sem depender de framework.</p>
+        </div>
+
+        <form class="form" id="pedidoForm">
+          <div class="field-grid">
+            <div class="field">
+              <label for="descontoPercentual">Desconto percentual</label>
+              <input id="descontoPercentual" name="desconto_percentual" type="number" min="0" max="100" step="0.1" value="0" />
+            </div>
+            <div class="field">
+              <label for="whatsappNumero">Número do WhatsApp</label>
+              <input id="whatsappNumero" name="whatsapp_numero" type="text" placeholder="5511999999999" />
+            </div>
+          </div>
+
+          <div class="items">
+            <div class="items__header">
+              <div>
+                <h3>Itens do pedido</h3>
+                <p>Adicione um ou mais produtos para compor o pedido.</p>
+              </div>
+              <button type="button" class="button button--ghost button--small" id="addItemButton">Adicionar item</button>
+            </div>
+            <div id="itemsContainer"></div>
+          </div>
+
+          <div class="actions">
+            <span class="hint">O backend calcula subtotais, total e desconto. O frontend só envia os dados.</span>
+            <button type="submit" class="button button--primary">Salvar pedido</button>
+          </div>
+        </form>
+      </article>
+
+      <article class="panel">
+        <div class="panel__header">
+          <div class="orders__header">
+            <div>
+              <h2 class="panel__title">Pedidos cadastrados</h2>
+              <p class="panel__desc">Lista carregada via `fetch` diretamente da API.</p>
+            </div>
+            <button type="button" class="button button--ghost button--small" id="reloadButton">Atualizar</button>
+          </div>
+        </div>
+        <div class="orders" id="ordersContainer">
+          <div class="empty-state">Carregando pedidos...</div>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <script type="module" src="script.js"></script>
+</body>
+</html>
