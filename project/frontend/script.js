@@ -1,4 +1,18 @@
-const API_BASE_URL = 'http://localhost:8000';
+// Detectar URL da API (desenvolvimento ou produção)
+const getAPIBaseURL = () => {
+  const stored = localStorage.getItem('apiBaseUrl');
+  if (stored) return stored;
+  
+  // Em desenvolvimento, usar localhost
+  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    return 'http://localhost:8000';
+  }
+  
+  // Em produção, usar a URL do Render
+  return 'https://pedidos-rg35.onrender.com';
+};
+
+const API_BASE_URL = getAPIBaseURL();
 
 const state = {
   pedidos: [],
